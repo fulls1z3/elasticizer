@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Elasticizer.Core</id>
+    <version>1.0.0-beta.1</version>
+    <title>$title$</title>
+    <authors>fulls1z3</authors>
+    <owners>fulls1z3</owners>
+    <licenseUrl>https://github.com/fulls1z3/elasticizer/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/fulls1z3/elasticizer</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <releaseNotes>Initial release</releaseNotes>
+    <copyright>Copyright (c) 2017 Burak Tasci</copyright>
+    <tags>elasticsearch dot-net dot-net-client library</tags>
+  </metadata>
+</package>
