@@ -1,5 +1,5 @@
 ﻿namespace Elasticizer.Domain {
-    public abstract class BaseDocument {
+    public abstract class BaseIndex : IIndex {
         public virtual string Id { get; set; }
     }
 }

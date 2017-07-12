@@ -8,7 +8,7 @@ using Nest;
 
 namespace Elasticizer.Core {
     public class ElasticRepository<T>
-        where T : BaseDocument {
+        where T : class, IIndex {
         private readonly ElasticClient _client;
         private readonly int _maxRetries;
 
