@@ -1,8 +1,7 @@
 # Elasticizer
-
 > Please support this project by simply putting a Github star. Share this library with friends on Twitter and everywhere else you can.
 
-**`Elasticizer`** is a lightweight [ElasticSearch] client library for .NET
+**`Elasticizer`** is a lightweight library to use [ElasticSearch] with .NET, allowing basic CRUD operations by implementing the repository pattern on the top of [Elasticsearch.Net] and [NEST].
 
 **NOTE**: This project is in experimental stage now, functionality is subject to slightly change.
 
@@ -19,7 +18,7 @@ Packages in this seed project depend on
 
 ## Getting started
 ### Installation
-You can install **`Elasticizer** by running following command in the Package Manager Console
+You can install **`Elasticizer`** by running following commands in the Package Manager Console
 ```
 Install-Package Elasticizer.Domain -Pre
 Install-Package Elasticizer.Core -Pre
@@ -42,9 +41,8 @@ Elasticizer Solution
    - Unit tests
 ```
 
-
 ### Running tests
-In order to run unit tests, simply clone this repository and run the tests using `Unit Test Explorer`.
+Simply clone this repository and run the tests using `Unit Test Explorer`.
 
 **NOTE**: You should provide the connection settings at the `app.config` before running the tests.
 
@@ -54,3 +52,6 @@ The MIT License (MIT)
 Copyright (c) 2017 [Burak Tasci]
 
 [ElasticSearch]: http://elastic.co
+[Elasticsearch.Net]: https://github.com/elastic/elasticsearch-net
+[NEST]: https://github.com/elastic/elasticsearch-net
+[Burak Tasci]: http://www.buraktasci.com
