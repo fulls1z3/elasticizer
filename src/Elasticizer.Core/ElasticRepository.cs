@@ -69,14 +69,14 @@ namespace Elasticizer.Core {
 
         public async Task<int> CreateAsync(IList<T> items, Refresh refresh = Refresh.WaitFor) {
             var descriptor = new BulkDescriptor();
-            
+
             foreach (var item in items)
                 if (string.IsNullOrWhiteSpace(item.Id))
                     descriptor.Index<T>(x => x
-                            .Document(item));
+                        .Document(item));
                 else
                     descriptor.Create<T>(x => x
-                            .Document(item));
+                        .Document(item));
 
             descriptor.Refresh(refresh);
 
@@ -103,9 +103,9 @@ namespace Elasticizer.Core {
 
             foreach (var id in ids)
                 descriptor.Update<T, T>(x => x.Id(id)
-                        .Doc(obj)
-                        .RetriesOnConflict(_maxRetries)
-                    );
+                    .Doc(obj)
+                    .RetriesOnConflict(_maxRetries)
+                );
 
             descriptor.Refresh(refresh);
 
@@ -132,9 +132,9 @@ namespace Elasticizer.Core {
 
             foreach (var id in ids)
                 descriptor.Update<T, object>(x => x.Id(id)
-                        .Doc(obj)
-                        .RetriesOnConflict(_maxRetries)
-                    );
+                    .Doc(obj)
+                    .RetriesOnConflict(_maxRetries)
+                );
 
             descriptor.Refresh(refresh);
 
@@ -159,13 +159,22 @@ namespace Elasticizer.Core {
 
             foreach (var id in ids.Where(x => !string.IsNullOrWhiteSpace(x)))
                 descriptor.Delete<T>(x => x
-                        .Id(id));
+                    .Id(id));
 
             descriptor.Refresh(refresh);
 
             var response = await _client.BulkAsync(descriptor);
 
             return !response.IsValid ? 0 : response.Items.Count;
+        }
+
+        public async Task<long> DeleteAsync(Func<DeleteByQueryDescriptor<T>, IDeleteByQueryRequest> descriptor,
+                                            Refresh refresh = Refresh.WaitFor) {
+            var response = await _client.DeleteByQueryAsync(descriptor);
+
+            await _client.RefreshAsync(_client.ConnectionSettings.DefaultIndex);
+
+            return !response.IsValid ? 0 : response.Deleted;
         }
     }
 }

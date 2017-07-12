@@ -82,7 +82,7 @@ namespace Elasticizer.Tests {
             var items = new List<MockDocument> {_mockDocumentWithId, _mockDocumentWithoutId};
             var count = await _mockRepo.CreateAsync(items);
 
-            foreach(var flag in deleteFlags)
+            foreach (var flag in deleteFlags)
                 Assert.True(flag);
 
             Assert.Equal(2, count);
@@ -336,6 +336,35 @@ namespace Elasticizer.Tests {
 
             var deleteFlag = await _mockRepo.DeleteAsync(ids);
             searchResults = await _mockRepo.SearchAsync(x => x.MatchAll());
+
+            Assert.Equal(2, deleteFlag);
+
+            Assert.NotNull(searchResults);
+            Assert.Collection(searchResults);
+            Assert.Empty(searchResults);
+        }
+
+        [Fact]
+        [TestPriority(53)]
+        public async Task DeleteAsyncByQueryShouldSucceed() {
+            var items = new List<MockDocument> {_mockDocumentWithId, _mockDocumentWithoutId};
+
+            foreach (var item in items)
+                item.IsActive = false;
+
+            var count = await _mockRepo.CreateAsync(items);
+
+            Assert.Equal(2, count);
+
+            var deleteFlag = await _mockRepo.DeleteAsync(x => x
+                .Query(q => q
+                    .Term(t => t
+                        .Field(f => f.IsActive)
+                        .Value(false)
+                    )
+                )
+            );
+            var searchResults = await _mockRepo.SearchAsync(x => x.MatchAll());
 
             Assert.Equal(2, deleteFlag);
 
