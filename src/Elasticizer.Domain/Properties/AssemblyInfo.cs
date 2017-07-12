@@ -9,3 +9,6 @@ using System.Runtime.InteropServices;
 [assembly:ComVisible(false)]
 
 [assembly:Guid("1e3da9ea-a4b9-40f1-be10-894fdde16daa")]
+
+[assembly:AssemblyVersion("1.0.0.2")]
+[assembly:AssemblyFileVersion("1.0.0.2")]
