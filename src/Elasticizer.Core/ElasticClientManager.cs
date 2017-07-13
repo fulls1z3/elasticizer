@@ -45,7 +45,9 @@ namespace Elasticizer.Core {
                 .EnableTcpKeepAlive(settings?.KeepAliveTime.Ticks > 0
                         ? settings.KeepAliveTime
                         : TimeSpan.FromMilliseconds(2000),
-                    settings?.KeepAliveInterval.Ticks > 0 ? settings.KeepAliveInterval : TimeSpan.FromMilliseconds(2000))
+                    settings?.KeepAliveInterval.Ticks > 0
+                        ? settings.KeepAliveInterval
+                        : TimeSpan.FromMilliseconds(2000))
                 .MaximumRetries(settings?.MaxRetries > 0 ? settings.MaxRetries : 10)
                 .MaxRetryTimeout(
                     settings?.MaxRetryTimeout.Ticks > 0 ? settings.MaxRetryTimeout : TimeSpan.FromMinutes(2))

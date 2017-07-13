@@ -111,9 +111,7 @@ namespace Elasticizer.Tests {
         [Fact]
         [TestPriority(30)]
         public void InitializationWithoutEndpointsShouldThrow() => Assert.Throws<ArgumentException>(
-            delegate {
-                ElasticClientManager.Initialize(null, _testIndex);
-            });
+            delegate { ElasticClientManager.Initialize(null, _testIndex); });
 
         [Fact]
         [TestPriority(31)]
