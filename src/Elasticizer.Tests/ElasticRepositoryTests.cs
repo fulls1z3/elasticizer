@@ -13,6 +13,7 @@ namespace Elasticizer.Tests {
     public class ElasticRepositoryTests : TestClassBase {
         // NOTE: You should provide the connection settings at the `app.config` before running the tests
         private readonly string _testEndpoint = ConfigurationManager.AppSettings["TEST_ENDPOINT"];
+
         private readonly string _testUsername = ConfigurationManager.AppSettings["TEST_USERNAME"];
         private readonly string _testPassword = ConfigurationManager.AppSettings["TEST_PASSWORD"];
         private readonly string _testIndex = ConfigurationManager.AppSettings["TEST_INDEX"];
@@ -188,7 +189,7 @@ namespace Elasticizer.Tests {
         }
 
         [Fact]
-        [TestPriority(43)]
+        [TestPriority(42)]
         public async Task UpdateAsyncWithAnonymousObjectShouldSucceed() {
             var result1 = await _mockRepo.GetAsync(_mockDocumentWithId.Id);
             var searchResults = await _mockRepo.SearchAsync(x => x
@@ -227,7 +228,7 @@ namespace Elasticizer.Tests {
         }
 
         [Fact]
-        [TestPriority(44)]
+        [TestPriority(43)]
         public async Task UpdateAsyncNonExistingWithAnonymousObjectShouldFail() {
             var id = await _mockRepo.UpdateAsync("0",
                 new {
@@ -261,6 +262,33 @@ namespace Elasticizer.Tests {
                 Assert.NotNull(item);
                 Assert.Equal(value, item.Value);
                 Assert.Equal(utcNow, item.UpdateDate);
+            }
+        }
+
+        [Fact]
+        [TestPriority(45)]
+        public async Task UpdateByQueryAsyncShouldSucceed() {
+            const string value = "corrected value #2";
+
+            var count = await _mockRepo.UpdateAsync(x => x
+                .Query(q => q
+                    .Term(t => t
+                        .Field(f => f.IsActive)
+                        .Value(false)
+                    )
+                )
+                .Script(s => s
+                    .Inline($"ctx._source.value = '{value}';")
+                )
+            );
+
+            var searchResponse = await _mockRepo.SearchAsync(x => x.MatchAll());
+
+            Assert.Equal(2, count);
+
+            foreach (var item in searchResponse) {
+                Assert.NotNull(item);
+                Assert.Equal(value, item.Value);
             }
         }
 
@@ -320,7 +348,7 @@ namespace Elasticizer.Tests {
 
         [Fact]
         [TestPriority(53)]
-        public async Task DeleteAsyncByQueryShouldSucceed() {
+        public async Task DeleteByQueryAsyncShouldSucceed() {
             var items = new List<MockDocument> {_mockDocumentWithId, _mockDocumentWithoutId};
 
             foreach (var item in items)

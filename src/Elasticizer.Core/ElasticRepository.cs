@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Elasticizer.Domain;
 using Elasticsearch.Net;
@@ -125,6 +126,15 @@ namespace Elasticizer.Core {
             var response = await _client.BulkAsync(descriptor);
 
             return !response.IsValid ? 0 : response.Items.Count;
+        }
+
+        public async Task<long> UpdateAsync(Func<UpdateByQueryDescriptor<T>, IUpdateByQueryRequest> selector, Refresh refresh = Refresh.WaitFor) {
+            var response = await _client.UpdateByQueryAsync(selector);
+
+            if (refresh != Refresh.False)
+                await _client.RefreshAsync(_client.ConnectionSettings.DefaultIndex);
+
+            return !response.IsValid ? 0 : response.Updated;
         }
 
         public async Task<bool> DeleteAsync(string id, Refresh refresh = Refresh.WaitFor) {
