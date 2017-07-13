@@ -98,22 +98,6 @@ namespace Elasticizer.Core {
             return response.Id;
         }
 
-        public async Task<int> UpdateAsync(IList<string> ids, T obj, Refresh refresh = Refresh.WaitFor) {
-            var descriptor = new BulkDescriptor();
-
-            foreach (var id in ids)
-                descriptor.Update<T, T>(x => x.Id(id)
-                    .Doc(obj)
-                    .RetriesOnConflict(_maxRetries)
-                );
-
-            descriptor.Refresh(refresh);
-
-            var response = await _client.BulkAsync(descriptor);
-
-            return !response.IsValid ? 0 : response.Items.Count;
-        }
-
         public async Task<string> UpdateAsync(string id, object obj, Refresh refresh = Refresh.WaitFor) {
             var response = await _client.UpdateAsync<T, object>(id,
                 x => x

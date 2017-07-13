@@ -189,32 +189,6 @@ namespace Elasticizer.Tests {
 
         [Fact]
         [TestPriority(43)]
-        public async Task UpdateAsyncBulkShouldSucceed() {
-            var searchResults = await _mockRepo.SearchAsync(x => x.MatchAll());
-            var ids = searchResults.Select(x => x.Id).ToList();
-
-            const string name = "corrected name";
-            var utcNow = DateTime.UtcNow;
-
-            var count = await _mockRepo.UpdateAsync(ids,
-                new MockDocument {
-                    Name = name,
-                    UpdateDate = utcNow
-                });
-
-            searchResults = await _mockRepo.SearchAsync(x => x.MatchAll());
-
-            Assert.Equal(2, count);
-
-            foreach (var item in searchResults) {
-                Assert.NotNull(item);
-                Assert.Equal(name, item.Name);
-                Assert.Equal(utcNow, item.UpdateDate);
-            }
-        }
-
-        [Fact]
-        [TestPriority(43)]
         public async Task UpdateAsyncWithAnonymousObjectShouldSucceed() {
             var result1 = await _mockRepo.GetAsync(_mockDocumentWithId.Id);
             var searchResults = await _mockRepo.SearchAsync(x => x
