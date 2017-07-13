@@ -22,7 +22,7 @@ namespace Elasticizer.Core {
         public async Task<T> GetAsync(string id) {
             var response = await _client.GetAsync<T>(id);
 
-            if (!response.IsValid || !response.Found)
+            if (!(response.IsValid && response.Found))
                 return null;
 
             var res = response.Source;
@@ -36,7 +36,7 @@ namespace Elasticizer.Core {
 
             var res = new List<T>();
 
-            if (!response.IsValid || response.Total == 0)
+            if (!(response.IsValid && response.Total > 0))
                 return res;
 
             foreach (var hit in response.Hits) {
@@ -61,7 +61,7 @@ namespace Elasticizer.Core {
                     x => x
                         .Refresh(refresh));
 
-            if (!response.IsValid || string.IsNullOrWhiteSpace(response.Id))
+            if (!(response.IsValid && !string.IsNullOrWhiteSpace(response.Id)))
                 return null;
 
             return response.Id;
@@ -92,7 +92,7 @@ namespace Elasticizer.Core {
                     .RetryOnConflict(_maxRetries)
                     .Refresh(refresh));
 
-            if (!response.IsValid || string.IsNullOrWhiteSpace(response.Id))
+            if (!(response.IsValid && !string.IsNullOrWhiteSpace(response.Id)))
                 return null;
 
             return response.Id;
@@ -105,7 +105,7 @@ namespace Elasticizer.Core {
                     .RetryOnConflict(_maxRetries)
                     .Refresh(refresh));
 
-            if (!response.IsValid || string.IsNullOrWhiteSpace(response.Id))
+            if (!(response.IsValid && !string.IsNullOrWhiteSpace(response.Id)))
                 return null;
 
             return response.Id;
