@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -12,9 +13,19 @@ namespace Elasticizer.Testing {
             foreach (var testCollection in testCollections) {
                 var priority = 0;
 
-                foreach (var attr in testCollection.CollectionDefinition.GetCustomAttributes(
-                    typeof(TestPriorityAttribute).AssemblyQualifiedName))
-                    priority = attr.GetNamedArgument<int>("Priority");
+                var index = testCollection.DisplayName.LastIndexOf(' ');
+
+                if (index > -1) {
+                    var assemblyName = testCollection.TestAssembly.Assembly.ToString().Split(',')[0];
+
+                    var className = testCollection.DisplayName.Substring(index + 1);
+                    var type = Type.GetType($"{className}, {assemblyName}");
+
+                    if (type != null) {
+                        var attr = type.GetCustomAttribute<TestPriorityAttribute>();
+                        priority = attr?.Priority ?? 0;
+                    }
+                }
 
                 GetOrCreate(sortedCollections, priority).Add(testCollection);
             }
