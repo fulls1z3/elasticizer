@@ -12,8 +12,8 @@ namespace Elasticizer.Core {
                                                string defaultIndex,
                                                ElasticSettings settings,
                                                ConnectionPool connectionPool) {
-            if (!(endpoints != null && endpoints.GetEnumerator().MoveNext()))
-                throw new ArgumentException("The argument `endpoints` cannot be null and must have at least one item.",
+            if (!endpoints.HasItems())
+                throw new ArgumentException(string.Format(Utils.ARGUMENT_EMPTY_LIST_MESSAGE, nameof(endpoints)),
                     nameof(endpoints));
 
             var uris = endpoints.Select(x => new Uri(x));

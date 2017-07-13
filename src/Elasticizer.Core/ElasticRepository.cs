@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Elasticizer.Domain;
 using Elasticsearch.Net;
@@ -21,6 +20,9 @@ namespace Elasticizer.Core {
         }
 
         public async Task<T> GetAsync(string id) {
+            if (string.IsNullOrWhiteSpace(id))
+                throw new ArgumentException(string.Format(Utils.ARGUMENT_EMPTY_MESSAGE, nameof(id)), nameof(id));
+
             var response = await _client.GetAsync<T>(id);
 
             if (!(response.IsValid && response.Found))
@@ -33,6 +35,10 @@ namespace Elasticizer.Core {
         }
 
         public async Task<IList<T>> SearchAsync(Func<SearchDescriptor<T>, ISearchRequest> descriptor) {
+            if (descriptor == null)
+                throw new ArgumentNullException(string.Format(Utils.ARGUMENT_NULL_MESSAGE, nameof(descriptor)),
+                    nameof(descriptor));
+
             var response = await _client.SearchAsync(descriptor);
 
             var res = new List<T>();
@@ -69,6 +75,10 @@ namespace Elasticizer.Core {
         }
 
         public async Task<int> CreateAsync(IList<T> items, Refresh refresh = Refresh.WaitFor) {
+            if (!items.HasItems())
+                throw new ArgumentException(string.Format(Utils.ARGUMENT_EMPTY_LIST_MESSAGE, nameof(items)),
+                    nameof(items));
+
             var descriptor = new BulkDescriptor();
 
             foreach (var item in items)
@@ -86,10 +96,13 @@ namespace Elasticizer.Core {
             return !response.IsValid ? 0 : response.Items.Count;
         }
 
-        public async Task<string> UpdateAsync(string id, T obj, Refresh refresh = Refresh.WaitFor) {
+        public async Task<string> UpdateAsync(string id, T item, Refresh refresh = Refresh.WaitFor) {
+            if (string.IsNullOrWhiteSpace(id))
+                throw new ArgumentException(string.Format(Utils.ARGUMENT_EMPTY_MESSAGE, nameof(id)), nameof(id));
+
             var response = await _client.UpdateAsync<T>(id,
                 x => x
-                    .Doc(obj)
+                    .Doc(item)
                     .RetryOnConflict(_maxRetries)
                     .Refresh(refresh));
 
@@ -99,10 +112,13 @@ namespace Elasticizer.Core {
             return response.Id;
         }
 
-        public async Task<string> UpdateAsync(string id, object obj, Refresh refresh = Refresh.WaitFor) {
+        public async Task<string> UpdateAsync(string id, object part, Refresh refresh = Refresh.WaitFor) {
+            if (string.IsNullOrWhiteSpace(id))
+                throw new ArgumentException(string.Format(Utils.ARGUMENT_EMPTY_MESSAGE, nameof(id)), nameof(id));
+
             var response = await _client.UpdateAsync<T, object>(id,
                 x => x
-                    .Doc(obj)
+                    .Doc(part)
                     .RetryOnConflict(_maxRetries)
                     .Refresh(refresh));
 
@@ -112,12 +128,15 @@ namespace Elasticizer.Core {
             return response.Id;
         }
 
-        public async Task<int> UpdateAsync(IList<string> ids, object obj, Refresh refresh = Refresh.WaitFor) {
+        public async Task<int> UpdateAsync(IList<string> ids, object part, Refresh refresh = Refresh.WaitFor) {
+            if (!ids.HasItems())
+                throw new ArgumentException(string.Format(Utils.ARGUMENT_EMPTY_LIST_MESSAGE, nameof(ids)), nameof(ids));
+
             var descriptor = new BulkDescriptor();
 
             foreach (var id in ids)
                 descriptor.Update<T, object>(x => x.Id(id)
-                    .Doc(obj)
+                    .Doc(part)
                     .RetriesOnConflict(_maxRetries)
                 );
 
@@ -128,7 +147,12 @@ namespace Elasticizer.Core {
             return !response.IsValid ? 0 : response.Items.Count;
         }
 
-        public async Task<long> UpdateAsync(Func<UpdateByQueryDescriptor<T>, IUpdateByQueryRequest> selector, Refresh refresh = Refresh.WaitFor) {
+        public async Task<long> UpdateAsync(Func<UpdateByQueryDescriptor<T>, IUpdateByQueryRequest> selector,
+                                            Refresh refresh = Refresh.WaitFor) {
+            if (selector == null)
+                throw new ArgumentNullException(string.Format(Utils.ARGUMENT_EMPTY_LIST_MESSAGE, nameof(selector)),
+                    nameof(selector));
+
             var response = await _client.UpdateByQueryAsync(selector);
 
             if (refresh != Refresh.False)
@@ -139,7 +163,7 @@ namespace Elasticizer.Core {
 
         public async Task<bool> DeleteAsync(string id, Refresh refresh = Refresh.WaitFor) {
             if (string.IsNullOrWhiteSpace(id))
-                return false;
+                throw new ArgumentException(string.Format(Utils.ARGUMENT_EMPTY_MESSAGE, nameof(id)), nameof(id));
 
             var response = await _client.DeleteAsync<T>(id,
                 x => x
