@@ -11,8 +11,8 @@ You can have a look at **unit tests** for demo usage. Meanwhile, usage instructi
 
 ## Prerequisites
 Packages in this seed project depend on
-- [ElasticSearch v5.4.0](https://www.nuget.org/packages/Elasticsearch.Net/5.4.0)
-- [NEST v5.4.0](https://www.nuget.org/packages/NEST/5.4.0)
+- [Elasticsearch.Net v5.4.0](https://www.nuget.org/packages/Elasticsearch.Net)
+- [NEST v5.4.0](https://www.nuget.org/packages/NEST)
 
 > Older versions contain outdated dependencies, might produce errors.
 
@@ -51,7 +51,7 @@ The MIT License (MIT)
 
 Copyright (c) 2017 [Burak Tasci]
 
-[ElasticSearch]: http://elastic.co
+[ElasticSearch]: https://www.elastic.co/
 [Elasticsearch.Net]: https://github.com/elastic/elasticsearch-net
 [NEST]: https://github.com/elastic/elasticsearch-net
 [Burak Tasci]: http://www.buraktasci.com
