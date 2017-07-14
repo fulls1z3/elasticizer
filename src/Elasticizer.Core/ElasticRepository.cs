@@ -8,7 +8,7 @@ using Nest;
 
 namespace Elasticizer.Core {
     public class ElasticRepository<T>
-        where T : class, IIndex {
+        where T : class, IDocument {
         private readonly ElasticClient _client;
         private readonly int _maxRetries;
 
@@ -36,8 +36,7 @@ namespace Elasticizer.Core {
 
         public async Task<IList<T>> SearchAsync(Func<SearchDescriptor<T>, ISearchRequest> descriptor) {
             if (descriptor == null)
-                throw new ArgumentNullException(string.Format(Utils.ARGUMENT_NULL_MESSAGE, nameof(descriptor)),
-                    nameof(descriptor));
+                throw new ArgumentNullException(string.Format(Utils.ARGUMENT_NULL_MESSAGE, nameof(descriptor)), nameof(descriptor));
 
             var response = await _client.SearchAsync(descriptor);
 
@@ -57,6 +56,9 @@ namespace Elasticizer.Core {
         }
 
         public async Task<string> CreateAsync(T item, Refresh refresh = Refresh.WaitFor) {
+            if (item == null)
+                throw new ArgumentNullException(string.Format(Utils.ARGUMENT_NULL_MESSAGE, nameof(item)), nameof(item));
+
             dynamic response;
 
             if (string.IsNullOrWhiteSpace(item.Id))
@@ -76,8 +78,7 @@ namespace Elasticizer.Core {
 
         public async Task<int> CreateAsync(IList<T> items, Refresh refresh = Refresh.WaitFor) {
             if (!items.HasItems())
-                throw new ArgumentException(string.Format(Utils.ARGUMENT_EMPTY_LIST_MESSAGE, nameof(items)),
-                    nameof(items));
+                throw new ArgumentException(string.Format(Utils.ARGUMENT_EMPTY_LIST_MESSAGE, nameof(items)), nameof(items));
 
             var descriptor = new BulkDescriptor();
 
@@ -100,6 +101,9 @@ namespace Elasticizer.Core {
             if (string.IsNullOrWhiteSpace(id))
                 throw new ArgumentException(string.Format(Utils.ARGUMENT_EMPTY_MESSAGE, nameof(id)), nameof(id));
 
+            if (item == null)
+                throw new ArgumentNullException(string.Format(Utils.ARGUMENT_NULL_MESSAGE, nameof(item)), nameof(item));
+
             var response = await _client.UpdateAsync<T>(id,
                 x => x
                     .Doc(item)
@@ -116,6 +120,9 @@ namespace Elasticizer.Core {
             if (string.IsNullOrWhiteSpace(id))
                 throw new ArgumentException(string.Format(Utils.ARGUMENT_EMPTY_MESSAGE, nameof(id)), nameof(id));
 
+            if (part == null)
+                throw new ArgumentNullException(string.Format(Utils.ARGUMENT_NULL_MESSAGE, nameof(part)), nameof(part));
+
             var response = await _client.UpdateAsync<T, object>(id,
                 x => x
                     .Doc(part)
@@ -131,6 +138,9 @@ namespace Elasticizer.Core {
         public async Task<int> UpdateAsync(IList<string> ids, object part, Refresh refresh = Refresh.WaitFor) {
             if (!ids.HasItems())
                 throw new ArgumentException(string.Format(Utils.ARGUMENT_EMPTY_LIST_MESSAGE, nameof(ids)), nameof(ids));
+
+            if (part == null)
+                throw new ArgumentNullException(string.Format(Utils.ARGUMENT_NULL_MESSAGE, nameof(part)), nameof(part));
 
             var descriptor = new BulkDescriptor();
 
@@ -150,8 +160,7 @@ namespace Elasticizer.Core {
         public async Task<long> UpdateAsync(Func<UpdateByQueryDescriptor<T>, IUpdateByQueryRequest> selector,
                                             Refresh refresh = Refresh.WaitFor) {
             if (selector == null)
-                throw new ArgumentNullException(string.Format(Utils.ARGUMENT_EMPTY_LIST_MESSAGE, nameof(selector)),
-                    nameof(selector));
+                throw new ArgumentNullException(string.Format(Utils.ARGUMENT_NULL_MESSAGE, nameof(selector)), nameof(selector));
 
             var response = await _client.UpdateByQueryAsync(selector);
 
@@ -173,6 +182,9 @@ namespace Elasticizer.Core {
         }
 
         public async Task<int> DeleteAsync(IList<string> ids, Refresh refresh = Refresh.WaitFor) {
+            if (!ids.HasItems())
+                throw new ArgumentException(string.Format(Utils.ARGUMENT_EMPTY_LIST_MESSAGE, nameof(ids)), nameof(ids));
+
             var descriptor = new BulkDescriptor();
 
             foreach (var id in ids.Where(x => !string.IsNullOrWhiteSpace(x)))
@@ -188,6 +200,9 @@ namespace Elasticizer.Core {
 
         public async Task<long> DeleteAsync(Func<DeleteByQueryDescriptor<T>, IDeleteByQueryRequest> descriptor,
                                             Refresh refresh = Refresh.WaitFor) {
+            if (descriptor == null)
+                throw new ArgumentNullException(string.Format(Utils.ARGUMENT_NULL_MESSAGE, nameof(descriptor)), nameof(descriptor));
+
             var response = await _client.DeleteByQueryAsync(descriptor);
 
             await _client.RefreshAsync(_client.ConnectionSettings.DefaultIndex);

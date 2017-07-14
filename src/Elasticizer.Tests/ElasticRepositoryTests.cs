@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Elasticizer.Core;
 using Elasticizer.Testing;
 using Elasticizer.Tests.Mocks;
+using Nest;
 using Xunit;
 
 namespace Elasticizer.Tests {
@@ -19,23 +20,23 @@ namespace Elasticizer.Tests {
         private readonly string _testIndex = ConfigurationManager.AppSettings["TEST_INDEX"];
         private readonly ElasticRepository<MockDocument> _mockRepo;
 
-        private readonly MockDocument _mockDocumentWithId;
         private readonly MockDocument _mockDocumentWithoutId;
+        private readonly MockDocument _mockDocumentWithId;
 
         public ElasticRepositoryTests() {
+            _mockDocumentWithoutId = new MockDocument {
+                Name = "mock #1",
+                Value = "mock #1's value",
+                CreationDate = DateTime.UtcNow,
+                IsActive = true
+            };
+
             _mockDocumentWithId = new MockDocument {
                 Id = "99",
                 Name = "mock #2",
                 Value = "mock #2's value",
                 CreationDate = DateTime.UtcNow,
                 IsActive = false
-            };
-
-            _mockDocumentWithoutId = new MockDocument {
-                Name = "mock #1",
-                Value = "mock #1's value",
-                CreationDate = DateTime.UtcNow,
-                IsActive = true
             };
 
             ElasticClientManager.Initialize(new List<string> {
@@ -47,9 +48,10 @@ namespace Elasticizer.Tests {
             _mockRepo = new ElasticRepository<MockDocument>(client);
         }
 
+        #region Create
         [Fact]
         [TestPriority(10)]
-        public async Task CreateAsyncWithIdShouldSucceed() {
+        public async Task CreateAsyncByItemWithIdShouldSucceed() {
             var id = await _mockRepo.CreateAsync(_mockDocumentWithId);
 
             Assert.Equal(_mockDocumentWithId.Id, id);
@@ -57,7 +59,7 @@ namespace Elasticizer.Tests {
 
         [Fact]
         [TestPriority(11)]
-        public async Task CreateAsyncWithoutIdShouldSucceed() {
+        public async Task CreateAsyncByItemWithoutIdShouldSucceed() {
             var id = await _mockRepo.CreateAsync(_mockDocumentWithoutId);
 
             Assert.False(string.IsNullOrWhiteSpace(id));
@@ -65,7 +67,7 @@ namespace Elasticizer.Tests {
 
         [Fact]
         [TestPriority(12)]
-        public async Task CreateAsyncExistingItemShouldFail() {
+        public async Task CreateAsyncByExistingItemShouldFail() {
             var id = await _mockRepo.CreateAsync(_mockDocumentWithId);
 
             Assert.Null(id);
@@ -73,7 +75,12 @@ namespace Elasticizer.Tests {
 
         [Fact]
         [TestPriority(13)]
-        public async Task CreateAsyncBulkShouldSucceed() {
+        public async Task CreateAsyncByNullItemShouldThrow() => await Assert.ThrowsAsync<ArgumentNullException>(
+            async delegate { await _mockRepo.CreateAsync((MockDocument)null); });
+
+        [Fact]
+        [TestPriority(14)]
+        public async Task CreateAsyncByItemsShouldSucceed() {
             var searchResults = await _mockRepo.SearchAsync(x => x.MatchAll());
             var deleteFlags = new List<bool>();
 
@@ -90,17 +97,15 @@ namespace Elasticizer.Tests {
         }
 
         [Fact]
-        [TestPriority(14)]
-        public async Task CreateAsyncEmptyItemsShouldThrow() => await Assert.ThrowsAsync<ArgumentException>(
-            async delegate {
-                var empty = new List<MockDocument>();
+        [TestPriority(15)]
+        public async Task CreateAsyncByEmptyItemsShouldThrow() => await Assert.ThrowsAsync<ArgumentException>(
+            async delegate { await _mockRepo.CreateAsync(new List<MockDocument>()); });
+        #endregion
 
-                await _mockRepo.CreateAsync(empty);
-            });
-
+        #region Get/Search
         [Fact]
         [TestPriority(20)]
-        public async Task GetAsyncShouldSucceed() {
+        public async Task GetAsyncByIdShouldSucceed() {
             var result1 = await _mockRepo.GetAsync(_mockDocumentWithId.Id);
             var result2 = await _mockRepo.GetAsync("xyz");
 
@@ -115,13 +120,12 @@ namespace Elasticizer.Tests {
 
         [Fact]
         [TestPriority(21)]
-        public async Task GetAsyncEmptyIdShouldThrow() => await Assert.ThrowsAsync<ArgumentException>(async delegate {
-            await _mockRepo.GetAsync("");
-        });
+        public async Task GetAsyncByEmptyIdShouldThrow() => await Assert.ThrowsAsync<ArgumentException>(
+            async delegate { await _mockRepo.GetAsync(""); });
 
         [Fact]
-        [TestPriority(30)]
-        public async Task SearchAsyncShouldSucceed() {
+        [TestPriority(22)]
+        public async Task SearchAsyncByDescriptorShouldSucceed() {
             var searchResults1 = await _mockRepo.SearchAsync(x => x.MatchAll());
             var searchResults2 = await _mockRepo.SearchAsync(x => x
                 .Query(q => q
@@ -151,13 +155,15 @@ namespace Elasticizer.Tests {
         }
 
         [Fact]
-        [TestPriority(31)]
-        public async Task SearchAsyncNullDescriptorShouldThrow() => await Assert.ThrowsAsync<ArgumentNullException>(
+        [TestPriority(23)]
+        public async Task SearchAsyncByNullDescriptorShouldThrow() => await Assert.ThrowsAsync<ArgumentNullException>(
             async delegate { await _mockRepo.SearchAsync(null); });
+        #endregion
 
+        #region Update
         [Fact]
-        [TestPriority(40)]
-        public async Task UpdateAsyncShouldSucceed() {
+        [TestPriority(30)]
+        public async Task UpdateAsyncByIdAndItemShouldSucceed() {
             var result1 = await _mockRepo.GetAsync(_mockDocumentWithId.Id);
             var searchResults = await _mockRepo.SearchAsync(x => x
                 .Query(q => !q
@@ -197,8 +203,8 @@ namespace Elasticizer.Tests {
         }
 
         [Fact]
-        [TestPriority(41)]
-        public async Task UpdateAsyncNonExistingItemShouldFail() {
+        [TestPriority(31)]
+        public async Task UpdateAsyncByIdAndNonExistingItemShouldFail() {
             var id = await _mockRepo.UpdateAsync("0",
                 new MockDocument {
                     UpdateDate = DateTime.UtcNow,
@@ -209,13 +215,18 @@ namespace Elasticizer.Tests {
         }
 
         [Fact]
-        [TestPriority(42)]
-        public async Task UpdateAsyncEmptyIdShouldThrow() => await Assert.ThrowsAsync<ArgumentException>(
+        [TestPriority(32)]
+        public async Task UpdateAsyncByEmptyIdAndItemShouldThrow() => await Assert.ThrowsAsync<ArgumentException>(
             async delegate { await _mockRepo.UpdateAsync("", new MockDocument()); });
 
         [Fact]
-        [TestPriority(43)]
-        public async Task UpdateAsyncWithAnonymousObjectShouldSucceed() {
+        [TestPriority(33)]
+        public async Task UpdateAsyncByIdAndNullItemShouldThrow() => await Assert.ThrowsAsync<ArgumentNullException>(
+            async delegate { await _mockRepo.UpdateAsync("0", null); });
+
+        [Fact]
+        [TestPriority(34)]
+        public async Task UpdateAsyncByIAndPartShouldSucceed() {
             var result1 = await _mockRepo.GetAsync(_mockDocumentWithId.Id);
             var searchResults = await _mockRepo.SearchAsync(x => x
                 .Query(q => !q
@@ -253,8 +264,8 @@ namespace Elasticizer.Tests {
         }
 
         [Fact]
-        [TestPriority(44)]
-        public async Task UpdateAsyncNonExistingItemWithAnonymousObjectShouldFail() {
+        [TestPriority(35)]
+        public async Task UpdateAsyncByNonExistingIdAndPartShouldFail() {
             var id = await _mockRepo.UpdateAsync("0",
                 new {
                     UpdateDate = DateTime.UtcNow,
@@ -265,13 +276,18 @@ namespace Elasticizer.Tests {
         }
 
         [Fact]
-        [TestPriority(45)]
-        public async Task UpdateAsyncEmptyIdWithAnonymousShouldThrow() => await Assert.ThrowsAsync<ArgumentException>(
+        [TestPriority(36)]
+        public async Task UpdateAsyncByEmptyIdAndPartShouldThrow() => await Assert.ThrowsAsync<ArgumentException>(
             async delegate { await _mockRepo.UpdateAsync("", new { }); });
 
         [Fact]
-        [TestPriority(46)]
-        public async Task UpdateAsyncBulkWithAnonymousObjectShouldSucceed() {
+        [TestPriority(37)]
+        public async Task UpdateAsyncByIdAndNullPartShouldThrow() => await Assert.ThrowsAsync<ArgumentNullException>(
+            async delegate { await _mockRepo.UpdateAsync("0", (object)null); });
+
+        [Fact]
+        [TestPriority(38)]
+        public async Task UpdateAsyncByIdsAndPartShouldSucceed() {
             var searchResponse = await _mockRepo.SearchAsync(x => x.MatchAll());
             var ids = searchResponse.Select(x => x.Id).ToList();
 
@@ -296,17 +312,18 @@ namespace Elasticizer.Tests {
         }
 
         [Fact]
-        [TestPriority(47)]
-        public async Task UpdateAsyncBulkEmptyItemsWithAnonymousShouldThrow() => await Assert
-            .ThrowsAsync<ArgumentException>(async delegate {
-                var empty = new List<string>();
-
-                await _mockRepo.UpdateAsync(empty, new { });
-            });
+        [TestPriority(39)]
+        public async Task UpdateAsyncByEmptyIdsAndPartShouldThrow() => await Assert.ThrowsAsync<ArgumentException>(
+            async delegate { await _mockRepo.UpdateAsync(new List<string>(), new { }); });
 
         [Fact]
-        [TestPriority(48)]
-        public async Task UpdateByQueryAsyncShouldSucceed() {
+        [TestPriority(40)]
+        public async Task UpdateAsyncByIdsAndNullPartShouldThrow() => await Assert.ThrowsAsync<ArgumentNullException>(
+            async delegate { await _mockRepo.UpdateAsync(new List<string>{ "1", "2" }, null); });
+
+        [Fact]
+        [TestPriority(41)]
+        public async Task UpdateAsyncBySelectorShouldSucceed() {
             const string value = "corrected value #2";
 
             var count = await _mockRepo.UpdateAsync(x => x
@@ -332,13 +349,15 @@ namespace Elasticizer.Tests {
         }
 
         [Fact]
-        [TestPriority(49)]
-        public async Task UpdateByQueryAsyncNullSelectorShouldThrow() => await
-            Assert.ThrowsAsync<ArgumentNullException>(async delegate { await _mockRepo.UpdateAsync(null); });
+        [TestPriority(42)]
+        public async Task UpdateByAsyncByNullSelectorShouldThrow() => await Assert.ThrowsAsync<ArgumentNullException>(
+            async delegate { await _mockRepo.UpdateAsync(null); });
+        #endregion
 
+        #region Delete
         [Fact]
         [TestPriority(50)]
-        public async Task DeleteAsyncShouldSucceed() {
+        public async Task DeleteAsyncByIdShouldSucceed() {
             var deleteFlag1 = await _mockRepo.DeleteAsync(_mockDocumentWithId.Id);
             var searchResults = await _mockRepo.SearchAsync(x => x
                 .Query(q => !q
@@ -363,12 +382,12 @@ namespace Elasticizer.Tests {
 
         [Fact]
         [TestPriority(51)]
-        public async Task DeleteAsyncEmptyIdShouldThrow() => await Assert.ThrowsAsync<ArgumentException>(
+        public async Task DeleteAsyncByEmptyIdShouldThrow() => await Assert.ThrowsAsync<ArgumentException>(
             async delegate { await _mockRepo.DeleteAsync(""); });
 
         [Fact]
         [TestPriority(52)]
-        public async Task DeleteAsyncBulkShouldSucceed() {
+        public async Task DeleteAsyncByIdsShouldSucceed() {
             var items = new List<MockDocument> {_mockDocumentWithId, _mockDocumentWithoutId};
             var count = await _mockRepo.CreateAsync(items);
 
@@ -389,17 +408,22 @@ namespace Elasticizer.Tests {
 
         [Fact]
         [TestPriority(53)]
-        public async Task DeleteByQueryAsyncShouldSucceed() {
+        public async Task DeleteAsyncByEmptyIdsShouldThrow() => await Assert.ThrowsAsync<ArgumentException>(
+            async delegate { await _mockRepo.DeleteAsync(new List<string>()); });
+
+        [Fact]
+        [TestPriority(54)]
+        public async Task DeleteAsyncByDescriptorShouldSucceed() {
             var items = new List<MockDocument> {_mockDocumentWithId, _mockDocumentWithoutId};
 
             foreach (var item in items)
                 item.IsActive = false;
 
-            var count = await _mockRepo.CreateAsync(items);
+            var createCount = await _mockRepo.CreateAsync(items);
 
-            Assert.Equal(2, count);
+            Assert.Equal(2, createCount);
 
-            var deleteFlag = await _mockRepo.DeleteAsync(x => x
+            var deleteCount = await _mockRepo.DeleteAsync(x => x
                 .Query(q => q
                     .Term(t => t
                         .Field(f => f.IsActive)
@@ -409,11 +433,17 @@ namespace Elasticizer.Tests {
             );
             var searchResults = await _mockRepo.SearchAsync(x => x.MatchAll());
 
-            Assert.Equal(2, deleteFlag);
+            Assert.Equal(2, deleteCount);
 
             Assert.NotNull(searchResults);
             Assert.Collection(searchResults);
             Assert.Empty(searchResults);
         }
+
+        [Fact]
+        [TestPriority(55)]
+        public async Task DeleteAsyncByNullDescriptorShouldThrow() => await Assert.ThrowsAsync<ArgumentNullException>(
+            async delegate { await _mockRepo.DeleteAsync((Func<DeleteByQueryDescriptor<MockDocument>, IDeleteByQueryRequest>)null); });
+        #endregion
     }
 }
