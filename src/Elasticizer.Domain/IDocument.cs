@@ -1,5 +1,5 @@
 ﻿namespace Elasticizer.Domain {
-    public interface IIndex {
+    public interface IDocument {
         string Id { get; set; }
     }
 }

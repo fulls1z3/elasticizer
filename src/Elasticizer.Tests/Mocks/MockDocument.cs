@@ -2,7 +2,7 @@
 using Elasticizer.Domain;
 
 namespace Elasticizer.Tests.Mocks {
-    public class MockDocument: BaseIndex {
+    public class MockDocument: BaseDocument {
         public string Name { get; set; }
         public string Value { get; set; }
         public DateTime CreationDate { get; set; }
