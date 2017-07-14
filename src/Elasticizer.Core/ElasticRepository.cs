@@ -97,7 +97,7 @@ namespace Elasticizer.Core {
             return !response.IsValid ? 0 : response.Items.Count;
         }
 
-        public async Task<string> UpdateAsync(string id, T item, Refresh refresh = Refresh.WaitFor) {
+        public async Task<bool> ReplaceAsync(string id, T item, Refresh refresh = Refresh.WaitFor) {
             if (string.IsNullOrWhiteSpace(id))
                 throw new ArgumentException(string.Format(Utils.ARGUMENT_EMPTY_MESSAGE, nameof(id)), nameof(id));
 
@@ -110,13 +110,10 @@ namespace Elasticizer.Core {
                     .RetryOnConflict(_maxRetries)
                     .Refresh(refresh));
 
-            if (!(response.IsValid && !string.IsNullOrWhiteSpace(response.Id)))
-                return null;
-
-            return response.Id;
+            return response.IsValid && !string.IsNullOrWhiteSpace(response.Id);
         }
 
-        public async Task<string> UpdateAsync(string id, object part, Refresh refresh = Refresh.WaitFor) {
+        public async Task<bool> UpdateAsync(string id, object part, Refresh refresh = Refresh.WaitFor) {
             if (string.IsNullOrWhiteSpace(id))
                 throw new ArgumentException(string.Format(Utils.ARGUMENT_EMPTY_MESSAGE, nameof(id)), nameof(id));
 
@@ -129,13 +126,10 @@ namespace Elasticizer.Core {
                     .RetryOnConflict(_maxRetries)
                     .Refresh(refresh));
 
-            if (!(response.IsValid && !string.IsNullOrWhiteSpace(response.Id)))
-                return null;
-
-            return response.Id;
+            return response.IsValid && !string.IsNullOrWhiteSpace(response.Id);
         }
 
-        public async Task<int> UpdateAsync(IList<string> ids, object part, Refresh refresh = Refresh.WaitFor) {
+        public async Task<long> UpdateAsync(IList<string> ids, object part, Refresh refresh = Refresh.WaitFor) {
             if (!ids.HasItems())
                 throw new ArgumentException(string.Format(Utils.ARGUMENT_EMPTY_LIST_MESSAGE, nameof(ids)), nameof(ids));
 
@@ -154,7 +148,7 @@ namespace Elasticizer.Core {
 
             var response = await _client.BulkAsync(descriptor);
 
-            return !response.IsValid ? 0 : response.Items.Count;
+            return !(response.IsValid && response.Items.Count > 0) ? 0 : response.Items.Count;
         }
 
         public async Task<long> UpdateAsync(Func<UpdateByQueryDescriptor<T>, IUpdateByQueryRequest> selector,
@@ -167,7 +161,7 @@ namespace Elasticizer.Core {
             if (refresh != Refresh.False)
                 await _client.RefreshAsync(_client.ConnectionSettings.DefaultIndex);
 
-            return !response.IsValid ? 0 : response.Updated;
+            return !(response.IsValid && response.Updated > 0) ? 0 : response.Updated;
         }
 
         public async Task<bool> DeleteAsync(string id, Refresh refresh = Refresh.WaitFor) {
@@ -181,7 +175,7 @@ namespace Elasticizer.Core {
             return response.IsValid;
         }
 
-        public async Task<int> DeleteAsync(IList<string> ids, Refresh refresh = Refresh.WaitFor) {
+        public async Task<bool> DeleteAsync(IList<string> ids, Refresh refresh = Refresh.WaitFor) {
             if (!ids.HasItems())
                 throw new ArgumentException(string.Format(Utils.ARGUMENT_EMPTY_LIST_MESSAGE, nameof(ids)), nameof(ids));
 
@@ -195,7 +189,7 @@ namespace Elasticizer.Core {
 
             var response = await _client.BulkAsync(descriptor);
 
-            return !response.IsValid ? 0 : response.Items.Count;
+            return response.IsValid;
         }
 
         public async Task<long> DeleteAsync(Func<DeleteByQueryDescriptor<T>, IDeleteByQueryRequest> descriptor,
