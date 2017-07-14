@@ -97,22 +97,6 @@ namespace Elasticizer.Core {
             return !response.IsValid ? 0 : response.Items.Count;
         }
 
-        public async Task<bool> ReplaceAsync(string id, T item, Refresh refresh = Refresh.WaitFor) {
-            if (string.IsNullOrWhiteSpace(id))
-                throw new ArgumentException(string.Format(Utils.ARGUMENT_EMPTY_MESSAGE, nameof(id)), nameof(id));
-
-            if (item == null)
-                throw new ArgumentNullException(string.Format(Utils.ARGUMENT_NULL_MESSAGE, nameof(item)), nameof(item));
-
-            var response = await _client.UpdateAsync<T>(id,
-                x => x
-                    .Doc(item)
-                    .RetryOnConflict(_maxRetries)
-                    .Refresh(refresh));
-
-            return response.IsValid && !string.IsNullOrWhiteSpace(response.Id);
-        }
-
         public async Task<bool> UpdateAsync(string id, object part, Refresh refresh = Refresh.WaitFor) {
             if (string.IsNullOrWhiteSpace(id))
                 throw new ArgumentException(string.Format(Utils.ARGUMENT_EMPTY_MESSAGE, nameof(id)), nameof(id));
