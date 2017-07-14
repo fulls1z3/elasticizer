@@ -10,7 +10,7 @@ You can have a look at **unit tests** for demo usage. Meanwhile, usage instructi
 > Built with `.NET Framework v4.6.2`, solution currently supports `ElasticSearch v5.x`.
 
 ## Prerequisites
-Packages in this seed project depend on
+Packages in this project depend on
 - [Elasticsearch.Net v5.4.0](https://www.nuget.org/packages/Elasticsearch.Net)
 - [NEST v5.4.0](https://www.nuget.org/packages/NEST)
 
@@ -25,7 +25,7 @@ Install-Package Elasticizer.Core -Pre
 ```
 
 ### Solution architecture
-The solution consists of 4 projects
+The solution consists of 3 projects
 ```
 Elasticizer Solution
 ├─ Elasticizer.Domain
@@ -33,12 +33,9 @@ Elasticizer Solution
 │  
 ├─ Elasticizer.Core
 │  - Core functionality
-│  
-├─ Elasticizer.Testing
-│  - Testing library, mocks
-│  
+│
 └─ Elasticizer.Tests
-   - Unit tests
+   - Unit tests, mocks
 ```
 
 ### Running tests
