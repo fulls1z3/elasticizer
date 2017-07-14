@@ -1,15 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.6
+VisualStudioVersion = 15.0.26621.2
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elasticizer.Core", "Elasticizer.Core\Elasticizer.Core.csproj", "{232CFA81-AE1E-4C25-AD73-164C343B80BF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elasticizer.Domain", "Elasticizer.Domain\Elasticizer.Domain.csproj", "{1E3DA9EA-A4B9-40F1-BE10-894FDDE16DAA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elasticizer.Tests", "Elasticizer.Tests\Elasticizer.Tests.csproj", "{BFD38EC5-A0A7-4B3E-88E6-F03D3989BBE5}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elasticizer.Testing", "Elasticizer.Testing\Elasticizer.Testing.csproj", "{AEBF3624-3459-409C-8538-5721ED1C837F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,12 +27,11 @@ Global
 		{BFD38EC5-A0A7-4B3E-88E6-F03D3989BBE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BFD38EC5-A0A7-4B3E-88E6-F03D3989BBE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BFD38EC5-A0A7-4B3E-88E6-F03D3989BBE5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AEBF3624-3459-409C-8538-5721ED1C837F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AEBF3624-3459-409C-8538-5721ED1C837F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AEBF3624-3459-409C-8538-5721ED1C837F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AEBF3624-3459-409C-8538-5721ED1C837F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {37284282-38EE-4450-9DD2-A6FBF9418065}
 	EndGlobalSection
 EndGlobal

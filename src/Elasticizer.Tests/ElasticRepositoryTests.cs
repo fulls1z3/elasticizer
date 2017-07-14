@@ -4,10 +4,10 @@ using System.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
 using Elasticizer.Core;
-using Elasticizer.Testing;
 using Elasticizer.Tests.Mocks;
 using Nest;
 using Xunit;
+using XunitOrderer;
 
 namespace Elasticizer.Tests {
     [TestPriority(20)]

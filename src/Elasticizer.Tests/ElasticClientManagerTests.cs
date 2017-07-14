@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Configuration;
 using Elasticizer.Core;
-using Elasticizer.Testing;
 using Elasticsearch.Net;
 using Xunit;
+using XunitOrderer;
 
 namespace Elasticizer.Tests {
     [TestPriority(10)]
@@ -103,7 +103,10 @@ namespace Elasticizer.Tests {
             Assert.Equal(settings.ConnectionLimit, testClient.ConnectionSettings.ConnectionLimit);
             Assert.Equal(settings.KeepAliveTime, testClient.ConnectionSettings.KeepAliveTime);
             Assert.Equal(settings.KeepAliveInterval, testClient.ConnectionSettings.KeepAliveInterval);
-            Assert.Equal(settings.MaxRetries, testClient.ConnectionSettings.MaxRetries.Value);
+
+            if (testClient.ConnectionSettings.MaxRetries != null)
+                Assert.Equal(settings.MaxRetries, testClient.ConnectionSettings.MaxRetries.Value);
+
             Assert.Equal(settings.MaxRetryTimeout, testClient.ConnectionSettings.MaxRetryTimeout);
             Assert.Equal(settings.RequestTimeout, testClient.ConnectionSettings.RequestTimeout);
         }

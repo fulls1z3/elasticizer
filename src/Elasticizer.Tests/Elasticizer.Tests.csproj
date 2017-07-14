@@ -68,6 +68,9 @@
     <Reference Include="xunit.execution.desktop, Version=2.2.0.3545, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
       <HintPath>..\packages\xunit.extensibility.execution.2.2.0\lib\net452\xunit.execution.desktop.dll</HintPath>
     </Reference>
+    <Reference Include="XunitOrderer, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\XunitOrderer.1.0.0\lib\net462\XunitOrderer.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ElasticClientManagerTests.cs" />
@@ -87,10 +90,6 @@
     <ProjectReference Include="..\Elasticizer.Domain\Elasticizer.Domain.csproj">
       <Project>{1E3DA9EA-A4B9-40F1-BE10-894FDDE16DAA}</Project>
       <Name>Elasticizer.Domain</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Elasticizer.Testing\Elasticizer.Testing.csproj">
-      <Project>{aebf3624-3459-409c-8538-5721ed1c837f}</Project>
-      <Name>Elasticizer.Testing</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
