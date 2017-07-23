@@ -55,6 +55,26 @@ namespace Elasticizer.Core {
             return res;
         }
 
+        public async Task<AggregationsHelper> AggregateAsync(SearchDescriptor<T> descriptor) {
+            if (descriptor == null)
+                throw new ArgumentNullException(string.Format(Utils.ARGUMENT_NULL_MESSAGE, nameof(descriptor)), nameof(descriptor));
+
+            descriptor.Size(0);
+
+            ISearchRequest Selector(SearchDescriptor<T> x) => descriptor;
+
+            var response = await _client.SearchAsync((Func<SearchDescriptor<T>, ISearchRequest>)Selector);
+
+            var res = new AggregationsHelper();
+
+            if (!(response.IsValid && response.Total > 0))
+                return res;
+
+            res = response.Aggs;
+
+            return res;
+        }
+
         public async Task<string> CreateAsync(T item, Refresh refresh = Refresh.WaitFor) {
             if (item == null)
                 throw new ArgumentNullException(string.Format(Utils.ARGUMENT_NULL_MESSAGE, nameof(item)), nameof(item));

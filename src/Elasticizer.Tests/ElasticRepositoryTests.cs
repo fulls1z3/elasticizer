@@ -104,7 +104,7 @@ namespace Elasticizer.Tests {
             async delegate { await _mockRepo.CreateAsync(new List<MockDocument>()); });
         #endregion
 
-        #region Get/Search
+        #region Get/Search/Aggregates
         [Fact]
         [TestPriority(20)]
         public async Task GetAsyncByIdShouldSucceed() {
@@ -160,6 +160,60 @@ namespace Elasticizer.Tests {
         [TestPriority(23)]
         public async Task SearchAsyncByNullDescriptorShouldThrow() => await Assert.ThrowsAsync<ArgumentNullException>(
             async delegate { await _mockRepo.SearchAsync(null); });
+
+        [Fact]
+        [TestPriority(24)]
+        public async Task AggregateAsyncByDescriptorShouldSucceed() {
+            var descriptor1 = new SearchDescriptor<MockDocument>();
+            var descriptor2 = new SearchDescriptor<MockDocument>();
+
+            descriptor1
+                .Aggregations(a => a
+                    .Terms("is_active",
+                        t => t
+                            .Field(f => f.IsActive)
+                    )
+                );
+            descriptor2
+                .Aggregations(a => a
+                    .Terms("is_active",
+                        t => t
+                            .Field(f => f.IsActive)
+                    )
+                )
+                .Query(q => q
+                    .Term(t => t
+                        .Field(f => f.Name)
+                        .Value("xyz")
+                    )
+                )
+                ;
+
+            var aggs1 = await _mockRepo.AggregateAsync(descriptor1);
+            var aggs2 = await _mockRepo.AggregateAsync(descriptor2);
+
+            var res1 = new List<dynamic>();
+
+            foreach (var bucket in (List<IBucket>)((BucketAggregate)aggs1.Aggregations["is_active"]).Items)
+                res1.Add(new {
+                    ((KeyedBucket<object>)bucket).Key,
+                    Count = ((KeyedBucket<object>)bucket).DocCount
+                });
+
+            Assert.NotNull(aggs1);
+            Assert.True(aggs1.Aggregations.ContainsKey("is_active"));
+
+            Assert.NotEmpty(res1);
+            Assert.Equal(2, res1.Count);
+
+            Assert.NotNull(aggs2);
+            Assert.False(aggs2.Aggregations.ContainsKey("is_active"));
+        }
+
+        [Fact]
+        [TestPriority(25)]
+        public async Task AggregateAsyncByNullDescriptorShouldThrow() => await Assert.ThrowsAsync<ArgumentNullException>(
+            async delegate { await _mockRepo.AggregateAsync(null); });
         #endregion
 
         #region Replace/Update
