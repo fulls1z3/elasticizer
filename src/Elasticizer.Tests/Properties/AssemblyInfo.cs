@@ -11,4 +11,4 @@ using Xunit;
 [assembly:Guid("bfd38ec5-a0a7-4b3e-88e6-f03d3989bbe5")]
 
 [assembly:CollectionBehavior(DisableTestParallelization = true)]
-[assembly:TestCollectionOrderer("XunitOrderer.TestCollectionOrderer", "XunitOrderer.Testing")]
+[assembly:TestCollectionOrderer("XunitOrderer.TestCollectionOrderer", "XunitOrderer")]
