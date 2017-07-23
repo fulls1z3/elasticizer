@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## v1.0.0-rc.3 - 2017-07-23
+### Changed
+- Updated `ElasticSearch.NET` and `NEST` to v5.5.0
+
 ## v1.0.0-rc.2 - 2017-07-23
 ### Added
 - Added Aggs feature (closes [#14](https://github.com/fulls1z3/elasticizer/issue/14))

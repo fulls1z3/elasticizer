@@ -11,8 +11,8 @@ You can have a look at **unit tests** for demo usage. Meanwhile, usage instructi
 
 ## Prerequisites
 Packages in this project depend on
-- [Elasticsearch.Net v5.4.0](https://www.nuget.org/packages/Elasticsearch.Net)
-- [NEST v5.4.0](https://www.nuget.org/packages/NEST)
+- [Elasticsearch.Net v5.5.0](https://www.nuget.org/packages/Elasticsearch.Net)
+- [NEST v5.5.0](https://www.nuget.org/packages/NEST)
 
 > Older versions contain outdated dependencies, might produce errors.
 
