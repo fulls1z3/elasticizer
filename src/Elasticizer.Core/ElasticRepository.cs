@@ -34,11 +34,11 @@ namespace Elasticizer.Core {
             return res;
         }
 
-        public async Task<IList<T>> SearchAsync(Func<SearchDescriptor<T>, ISearchRequest> descriptor) {
-            if (descriptor == null)
-                throw new ArgumentNullException(string.Format(Utils.ARGUMENT_NULL_MESSAGE, nameof(descriptor)), nameof(descriptor));
+        public async Task<IList<T>> SearchAsync(Func<SearchDescriptor<T>, ISearchRequest> selector) {
+            if (selector == null)
+                throw new ArgumentNullException(string.Format(Utils.ARGUMENT_NULL_MESSAGE, nameof(selector)), nameof(selector));
 
-            var response = await _client.SearchAsync(descriptor);
+            var response = await _client.SearchAsync(selector);
 
             var res = new List<T>();
 
@@ -196,12 +196,12 @@ namespace Elasticizer.Core {
             return response.IsValid;
         }
 
-        public async Task<long> DeleteAsync(Func<DeleteByQueryDescriptor<T>, IDeleteByQueryRequest> descriptor,
+        public async Task<long> DeleteAsync(Func<DeleteByQueryDescriptor<T>, IDeleteByQueryRequest> selector,
                                             Refresh refresh = Refresh.WaitFor) {
-            if (descriptor == null)
-                throw new ArgumentNullException(string.Format(Utils.ARGUMENT_NULL_MESSAGE, nameof(descriptor)), nameof(descriptor));
+            if (selector == null)
+                throw new ArgumentNullException(string.Format(Utils.ARGUMENT_NULL_MESSAGE, nameof(selector)), nameof(selector));
 
-            var response = await _client.DeleteByQueryAsync(descriptor);
+            var response = await _client.DeleteByQueryAsync(selector);
 
             await _client.RefreshAsync(_client.ConnectionSettings.DefaultIndex);
 
