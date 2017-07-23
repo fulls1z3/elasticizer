@@ -1,6 +1,14 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## v1.0.0-rc.2 - 2017-07-23
+### Added
+- Added Aggs feature (closes [#14](https://github.com/fulls1z3/elasticizer/issue/14))
+- Added missing `ConnectionConfiguration` members (closes [#16](https://github.com/fulls1z3/elasticizer/issue/16))
+
+### Fixed
+- Resolved AssemblyName for `TestCollectionOrderer` (closes [#15](https://github.com/fulls1z3/elasticizer/issue/15))
+
 ## v1.0.0-rc.1 - 2017-07-14
 ### Added
 - Added UpdateByQuery feature  (closes [#9](https://github.com/fulls1z3/elasticizer/issue/9))
