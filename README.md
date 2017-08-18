@@ -43,6 +43,13 @@ Simply clone this repository and run the tests using `Unit Test Explorer`.
 
 **NOTE**: You should provide the connection settings at the `app.config` before running the tests.
 
+## Contributing
+If you want to file a bug, contribute some code, or improve documentation, please read up on the following contribution guidelines:
+- [Issue guidelines](CONTRIBUTING.md#submit)
+- [Contributing guidelines](CONTRIBUTING.md)
+- [Coding rules](CONTRIBUTING.md#rules)
+- [ChangeLog](CHANGELOG.md)
+
 ## License
 The MIT License (MIT)
 
